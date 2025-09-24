@@ -19,9 +19,11 @@ install -d "$TARGET_ROOT/usr/share/color-schemes"
 install -m 0644 "$ASSETS/kde/colors/Kernelos.colors" "$TARGET_ROOT/usr/share/color-schemes/Kernelos.colors"
 
 # KDE: Look-and-Feel package
-install -d "$TARGET_ROOT/usr/share/plasma/look-and-feel/org.kernelos.desktop/contents"
+install -d "$TARGET_ROOT/usr/share/plasma/look-and-feel/org.kernelos.desktop/contents/splash"
 install -m 0644 "$ASSETS/kde/lookandfeel/org.kernelos.desktop/metadata.desktop" "$TARGET_ROOT/usr/share/plasma/look-and-feel/org.kernelos.desktop/metadata.desktop"
 install -m 0644 "$ASSETS/kde/lookandfeel/org.kernelos.desktop/contents/defaults" "$TARGET_ROOT/usr/share/plasma/look-and-feel/org.kernelos.desktop/contents/defaults"
+install -m 0644 "$ASSETS/kde/lookandfeel/org.kernelos.desktop/contents/splash/Splash.qml" "$TARGET_ROOT/usr/share/plasma/look-and-feel/org.kernelos.desktop/contents/splash/Splash.qml"
+cp -f "$ASSETS/calamares/branding/kernelos/logo.png" "$TARGET_ROOT/usr/share/plasma/look-and-feel/org.kernelos.desktop/contents/splash/logo.png" || true
 
 # Wallpapers
 install -d "$TARGET_ROOT/usr/share/wallpapers/KernelosDark/contents/images"
@@ -32,6 +34,17 @@ install -d "$TARGET_ROOT/etc/skel/.config"
 cat > "$TARGET_ROOT/etc/skel/.config/kdeglobals" <<'EOF'
 [General]
 ColorScheme=Kernelos
+
+[Icons]
+Theme=breeze-dark
+
+[KDE]
+LookAndFeelPackage=org.kernelos.desktop
+EOF
+cat > "$TARGET_ROOT/etc/skel/.config/kcminputrc" <<'EOF'
+[Mouse]
+cursorTheme=Breeze
+cursorSize=24
 EOF
 
 # SDDM theme

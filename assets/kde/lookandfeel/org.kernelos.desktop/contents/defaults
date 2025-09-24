@@ -1,8 +1,18 @@
 [kdeglobals][General]
 ColorScheme=Kernelos
 
+[kdeglobals][Icons]
+Theme=breeze-dark
+
+[kdeglobals][KDE]
+LookAndFeelPackage=org.kernelos.desktop
+
 [plasmarc][Theme]
 name=breeze-dark
 
 [Wallpaper][org.kde.image][General]
 Image=/usr/share/wallpapers/KernelosDark/contents/images/3840x2160.jpg
+
+[kcminputrc][Mouse]
+cursorTheme=Breeze
+cursorSize=24

@@ -9,43 +9,68 @@ Rectangle {
   color: "#24292f"
 
   Image {
-    id: bg
     anchors.fill: parent
     source: "background.jpg"
     fillMode: Image.PreserveAspectCrop
-    cache: true
+  }
+
+  Rectangle {
+    anchors.fill: parent
+    gradient: Gradient {
+      GradientStop { position: 0.0; color: "#55000000" }
+      GradientStop { position: 1.0; color: "#66000000" }
+    }
   }
 
   Column {
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.verticalCenter: parent.verticalCenter
-    spacing: 16
+    spacing: 20
+    anchors.margins: 24
 
     Image {
       source: "logo.png"
-      width: 128; height: 128
+      width: 148; height: 148
       fillMode: Image.PreserveAspectFit
     }
 
-    TextField {
-      id: user
-      placeholderText: qsTr("Utilisateur")
-      text: Sddm.userModel.lastUser
-      width: 320
-      onAccepted: password.forceActiveFocus()
-    }
+    Rectangle {
+      width: 420; height: 120
+      radius: 12
+      color: "#1a000000"
+      border.color: "#3a3f46"
+      border.width: 1
 
-    TextField {
-      id: password
-      placeholderText: qsTr("Mot de passe")
-      echoMode: TextInput.Password
-      width: 320
-      onAccepted: login()
+      Column {
+        anchors.fill: parent
+        anchors.margins: 16
+        spacing: 10
+
+        TextField {
+          id: user
+          placeholderText: qsTr("Utilisateur")
+          text: Sddm.userModel.lastUser
+          width: parent.width
+          height: 36
+        }
+
+        TextField {
+          id: password
+          placeholderText: qsTr("Mot de passe")
+          echoMode: TextInput.Password
+          width: parent.width
+          height: 36
+          onAccepted: login()
+        }
+      }
     }
 
     Button {
       text: qsTr("Se connecter")
-      width: 320
+      width: 420
+      height: 40
+      background: Rectangle { radius: 8; color: "#d8b9ff" }
+      contentItem: Text { text: parent.parent.text; color: "#24292f"; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter; font.pixelSize: 16 }
       onClicked: login()
     }
   }
