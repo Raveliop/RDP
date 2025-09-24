@@ -10,7 +10,7 @@ ASSETS="$REPO_ROOT/assets"
 # Target root (chroot) or overlay directory
 TARGET_ROOT="${TARGET_ROOT:-}"
 if [[ -z "${TARGET_ROOT}" ]]; then
-  TARGET_ROOT="$REPO_ROOT/../root-overlay"
+  TARGET_ROOT="$REPO_ROOT/root-overlay"
 fi
 mkdir -p "$TARGET_ROOT"
 
