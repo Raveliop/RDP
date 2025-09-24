@@ -1,0 +1,14 @@
+out/
+/out/
+.cache/
+/tmp/
+work/
+rootfs/
+chroot/
+build/
+artifacts/
+*.iso
+*.img
+*.qcow2
+.DS_Store
+node_modules/

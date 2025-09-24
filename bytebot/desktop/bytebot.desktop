@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Bytebot
+Exec=/usr/bin/xdg-open http://localhost:3000
+Terminal=false
+Categories=Network;Utility;
