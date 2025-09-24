@@ -34,25 +34,26 @@ jobs:
         run: |
           bash scripts/branding/generate_assets.sh
 
-      - name: Bootstrap base system (stub)
-        run: |
-          bash scripts/bootstrap.sh "$ARCH"
 
-      - name: Customize system (stub)
+      - name: Bootstrap base system
         run: |
-          bash scripts/customize.sh "$ARCH"
+          sudo --preserve-env=ARCH,VSCODE_FLAVOR bash scripts/bootstrap.sh "$ARCH"
+
+      - name: Customize system
+        run: |
+          sudo --preserve-env=ARCH,VSCODE_FLAVOR bash scripts/customize.sh "$ARCH"
 
       - name: Apply theme and branding
         run: |
-          bash scripts/theme/apply.sh
+          sudo --preserve-env=ARCH,VSCODE_FLAVOR bash scripts/theme/apply.sh
 
-      - name: Setup Calamares (stub)
+      - name: Setup Calamares
         run: |
-          bash scripts/installer/build_calamares.sh "$ARCH"
+          sudo --preserve-env=ARCH,VSCODE_FLAVOR bash scripts/installer/build_calamares.sh "$ARCH"
 
       - name: Build ISO
         run: |
-          bash scripts/iso/build_iso.sh "$ARCH"
+          sudo --preserve-env=ARCH,VSCODE_FLAVOR bash scripts/iso/build_iso.sh "$ARCH"
 
       - name: Compute SHA256 and list artifacts
         run: |
