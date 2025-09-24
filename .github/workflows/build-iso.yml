@@ -9,23 +9,73 @@ jobs:
     strategy:
       matrix:
         arch: [amd64, arm64]
+    env:
+      ARCH: ${{ matrix.arch }}
+      VSCODE_FLAVOR: code
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup QEMU
+
+      - name: Setup QEMU (for cross-arch)
         uses: docker/setup-qemu-action@v3
-      - name: Install dependencies
+
+      - name: Install build dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y imagemagick optipng
-      - name: Branding assets
+          sudo apt-get install -y \
+            debootstrap qemu-user-static squashfs-tools xorriso \
+            grub-efi-amd64-bin grub-efi-arm64-bin grub-pc-bin \
+            mtools dosfstools syslinux-common isolinux rsync \
+            imagemagick optipng
+
+      - name: Generate branding assets
         run: |
           bash scripts/branding/generate_assets.sh
-      - name: Upload wallpapers
+
+      - name: Bootstrap base system (stub)
+        run: |
+          bash scripts/bootstrap.sh "$ARCH"
+
+      - name: Customize system (stub)
+        run: |
+          bash scripts/customize.sh "$ARCH"
+
+      - name: Apply theme and branding
+        run: |
+          bash scripts/theme/apply.sh
+
+      - name: Setup Calamares (stub)
+        run: |
+          bash scripts/installer/build_calamares.sh "$ARCH"
+
+      - name: Build ISO
+        run: |
+          bash scripts/iso/build_iso.sh "$ARCH"
+
+      - name: Compute SHA256 and list artifacts
+        run: |
+          echo "Artifacts for $ARCH:" && ls -l out/iso/$ARCH || true
+
+      - name: Upload ISO artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: wallpapers-${{ matrix.arch }}
-          path: assets/wallpapers/*.jpg
-          if-no-files-found: ignore
+          name: kernelos-${{ matrix.arch }}
+          path: |
+            out/iso/${{ matrix.arch }}/*.iso
+            out/iso/${{ matrix.arch }}/*.sha256
+          if-no-files-found: error
+
+      - name: Create pre-release (branch pushes only)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: true
+          tag_name: prerelease-${{ github.run_id }}-${{ matrix.arch }}
+          name: "KERNELOS prerelease ${{ github.run_id }} (${{ matrix.arch }})"
+          files: |
+            out/iso/${{ matrix.arch }}/*.iso
+            out/iso/${{ matrix.arch }}/*.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
