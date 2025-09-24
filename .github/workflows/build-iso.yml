@@ -23,12 +23,15 @@ jobs:
 
       - name: Install build dependencies
         run: |
+          sudo dpkg --add-architecture arm64
           sudo apt-get update -y
           sudo apt-get install -y \
             debootstrap qemu-user-static squashfs-tools xorriso \
-            grub-efi-amd64-bin grub-efi-arm64-bin grub-pc-bin \
-            mtools dosfstools syslinux-common isolinux rsync \
-            imagemagick optipng
+            grub-efi-amd64-bin grub-pc-bin grub-common \
+            mtools dosfstools rsync imagemagick optipng
+          if [[ "${{ matrix.arch }}" == "arm64" ]]; then \
+            sudo apt-get install -y grub-efi-arm64-bin:arm64; \
+          fi
 
       - name: Generate branding assets
         run: |
