@@ -23,7 +23,7 @@ jobs:
 
       - name: Install build dependencies
         run: |
-          sudo dpkg --add-architecture arm64
+          if [[ "${{ matrix.arch }}" == "arm64" ]]; then sudo dpkg --add-architecture arm64; fi
           sudo apt-get update -y
           sudo apt-get install -y \
             debootstrap qemu-user-static squashfs-tools xorriso \
