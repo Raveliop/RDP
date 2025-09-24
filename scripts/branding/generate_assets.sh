@@ -15,6 +15,10 @@ BG="#24292f"
 ACCENT="#d8b9ff"
 LOGO_PNG="$SRC_DIR/logo-original.png"
 LOGO_SVG="$SRC_DIR/logo-original.svg"
+# Optional external wallpaper override
+WP_SRC=""
+if [[ -f "$SRC_DIR/wallpaper-original.png" ]]; then WP_SRC="$SRC_DIR/wallpaper-original.png"; fi
+if [[ -z "$WP_SRC" && -f "$SRC_DIR/wallpaper-original.jpg" ]]; then WP_SRC="$SRC_DIR/wallpaper-original.jpg"; fi
 GEN_INVERT="${GENERATE_INVERT:-1}"
 mkdir -p "$ICON_PNG_DIR" "$WALL_DIR" "$SDDM_DIR" "$CAL_DIR" "$GRUB_DIR"
 need() { command -v "$1" >/dev/null 2>&1; }
@@ -26,18 +30,19 @@ if [[ $USE_SVG -eq 1 ]]; then echo "SVG detected but not required" >/dev/null; f
 if [[ ! -f "$LOGO_PNG" ]]; then echo "missing: $LOGO_PNG"; exit 1; fi
 convert "$LOGO_PNG" -resize 2048x2048\> -strip PNG32:"$OUT_LOGO"
 optipng -o7 -quiet "$OUT_LOGO" || true
-if [[ "$GEN_INVERT" = "1" ]]; then convert "$OUT_LOGO" -colorspace sRGB -channel RGB -negate +channel PNG32:"$OUT_LOGO_INV"; optipng -o7 -quiet "$OUT_LOGO_INV" || true; fi
+if [[ "$GEN_INVERT" = "1" ]]; then convert "$OUT_LOGO" -alpha on -channel RGB -negate -channel A -evaluate set 100% +channel PNG32:"$OUT_LOGO_INV"; optipng -o7 -quiet "$OUT_LOGO_INV" || true; fi
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 TRIM="$TMP_DIR/trim.png"
 convert "$OUT_LOGO" -alpha on -fuzz 5% -trim +repage PNG32:"$TRIM"
-read -r W H < <(identify -format "%w %h" "$TRIM")
+W=$(identify -format "%w" "$TRIM") || W=0
+H=$(identify -format "%h" "$TRIM") || H=0
 CROP_SRC="$TRIM"
 if (( W > H*3/2 )); then convert "$TRIM" -crop "${H}x${H}+0+0" +repage "$TMP_DIR/crop.png"; CROP_SRC="$TMP_DIR/crop.png"; elif (( H > W*3/2 )); then convert "$TRIM" -crop "${W}x${W}+0+0" +repage "$TMP_DIR/crop.png"; CROP_SRC="$TMP_DIR/crop.png"; fi
 convert "$CROP_SRC" -resize 819x819 -background none -gravity center -extent 1024x1024 PNG32:"$ICON_MAIN"
 optipng -o7 -quiet "$ICON_MAIN" || true
 for s in 512 256 128 64 32; do convert "$ICON_MAIN" -resize ${s}x${s} PNG32:"$ICON_PNG_DIR/${s}.png"; optipng -o7 -quiet "$ICON_PNG_DIR/${s}.png" || true; done
-mk_wall() { local W=$1 H=$2 OUT=$3; convert -size ${W}x${H} xc:"$BG" "$TMP_DIR/bg.png"; convert -size ${W}x${H} radial-gradient:none-"$ACCENT" "$TMP_DIR/grad.png"; convert "$TMP_DIR/bg.png" "$TMP_DIR/grad.png" -compose softlight -define compose:args=25 -composite "$TMP_DIR/soft.png"; convert -size ${W}x${H} granite: -colorspace sRGB -brightness-contrast -15x-15 -alpha set -channel a -evaluate set 8% +channel "$TMP_DIR/tex.png"; convert "$TMP_DIR/soft.png" "$TMP_DIR/tex.png" -compose overlay -define compose:args=20 -composite "$TMP_DIR/wall.png"; local LSIZE; if (( W < H )); then LSIZE=$(( W/4 )); else LSIZE=$(( H/4 )); fi; convert "$OUT_LOGO" -alpha on -resize ${LSIZE}x${LSIZE} "$TMP_DIR/logo_w.png"; composite -dissolve 8 -gravity center "$TMP_DIR/logo_w.png" "$TMP_DIR/wall.png" "$TMP_DIR/with_logo.png"; convert "$TMP_DIR/with_logo.png" -strip -quality 92 "$OUT"; };
+mk_wall() { local W=$1 H=$2 OUT=$3; if [[ -n "$WP_SRC" ]]; then convert "$WP_SRC" -auto-orient -resize ${W}x${H}^ -gravity center -extent ${W}x${H} "$TMP_DIR/wall.png"; else convert -size ${W}x${H} xc:"$BG" "$TMP_DIR/bg.png"; convert -size ${W}x${H} radial-gradient:#00000000-"$ACCENT" "$TMP_DIR/grad.png"; convert "$TMP_DIR/bg.png" "$TMP_DIR/grad.png" -compose softlight -define compose:args=25 -composite "$TMP_DIR/soft.png"; convert -size ${W}x${H} granite: -colorspace sRGB -brightness-contrast -15x-15 -alpha set -channel a -evaluate set 8% +channel "$TMP_DIR/tex.png"; convert "$TMP_DIR/soft.png" "$TMP_DIR/tex.png" -compose overlay -define compose:args=20 -composite "$TMP_DIR/wall.png"; fi; local LSIZE; if (( W < H )); then LSIZE=$(( W/4 )); else LSIZE=$(( H/4 )); fi; convert "$OUT_LOGO" -alpha on -resize ${LSIZE}x${LSIZE} "$TMP_DIR/logo_w.png"; composite -dissolve 8 -gravity center "$TMP_DIR/logo_w.png" "$TMP_DIR/wall.png" "$TMP_DIR/with_logo.png"; convert "$TMP_DIR/with_logo.png" -strip -quality 92 "$OUT"; };
 mk_wall 3840 2160 "$WALL_DIR/kernelos-dark-3840x2160.jpg"
 mk_wall 2560 1440 "$WALL_DIR/kernelos-dark-2560x1440.jpg"
 mk_wall 1920 1080 "$WALL_DIR/kernelos-dark-1920x1080.jpg"

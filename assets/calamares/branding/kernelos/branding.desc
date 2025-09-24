@@ -1,0 +1,11 @@
+---
+componentName: kernelos
+productName: "KERNELOS"
+version: "24.04 LTS"
+shortVersion: "24.04"
+imagePath: .
+slideshow: slideshow.qml
+# Images relative to this directory
+images:
+  productLogo: logo.png
+  banner: banner.jpg

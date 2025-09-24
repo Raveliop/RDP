@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=KERNELOS
+Comment=KERNELOS Look and Feel
+X-KDE-ServiceTypes=Plasma/LookAndFeel
+Type=Service
+
+X-KDE-PluginInfo-Author=Capy
+X-KDE-PluginInfo-Email=team@kernelos.local
+X-KDE-PluginInfo-Name=org.kernelos.desktop
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-License=GPLv3
+X-KDE-PluginInfo-EnabledByDefault=true

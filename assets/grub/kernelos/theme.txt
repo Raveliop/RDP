@@ -1,0 +1,8 @@
+# KERNELOS GRUB Theme
+desktop-image: "background.jpg"
+desktop-color: "#24292f"
+title-color:   "#ffffff"
+message-color: "#ffffff"
+border-color:  "#d8b9ff"
+highlight-color: "#24292f"
+selected_item_color: "#d8b9ff"
