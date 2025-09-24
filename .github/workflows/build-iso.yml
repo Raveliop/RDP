@@ -1,0 +1,31 @@
+name: Build ISO
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y imagemagick optipng
+      - name: Branding assets
+        run: |
+          bash scripts/branding/generate_assets.sh
+      - name: Upload wallpapers
+        uses: actions/upload-artifact@v4
+        with:
+          name: wallpapers-${{ matrix.arch }}
+          path: assets/wallpapers/*.jpg
+          if-no-files-found: ignore
